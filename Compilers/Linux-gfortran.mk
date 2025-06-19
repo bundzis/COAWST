@@ -187,12 +187,18 @@ endif
 
 ifdef USE_NETCDF4
         NF_CONFIG ?= nf-config
-    NETCDF_INCDIR ?= $(shell $(NF_CONFIG) --prefix)/include
-             LIBS += $(shell $(NF_CONFIG) --flibs)
+    #NETCDF_INCDIR ?= /opt/cray/pe/netcdf/4.9.0.13/gnu/12.3/include  # BCU
+             #LIBS += -L/opt/cray/pe/netcdf/4.9.0.13/gnu/12.3/lib -lnetcdf -lnetcdff  # BCU
+    NETCDF_INCDIR ?= $(NETCDF_DIR)/include  # BCU
+             LIBS += -L$(NETCDF_DIR)/lib -lnetcdf -lnetcdff  # BCU
+#    NETCDF_INCDIR ?= $(shell $(NF_CONFIG) --prefix)/include
+#             LIBS += $(shell $(NF_CONFIG) --flibs)
            INCDIR += $(NETCDF_INCDIR) $(INCDIR)
 else
-    NETCDF_INCDIR ?= /opt/gfortransoft/serial/netcdf3/include
-    NETCDF_LIBDIR ?= /opt/gfortransoft/serial/netcdf3/lib
+    NETCDF_INCDIR ?= /opt/cray/pe/netcdf/4.9.0.9/gnu/12.3/include  # BCU
+    NETCDF_LIBDIR ?= /opt/cray/pe/netcdf/4.9.0.9/gnu/12.3/lib  # BCU
+#    NETCDF_INCDIR ?= /opt/gfortransoft/serial/netcdf3/include
+#    NETCDF_LIBDIR ?= /opt/gfortransoft/serial/netcdf3/lib
       NETCDF_LIBS ?= -lnetcdf -lnetcdff
              LIBS += -L$(NETCDF_LIBDIR) $(NETCDF_LIBS)
            INCDIR += $(NETCDF_INCDIR) $(INCDIR)
@@ -232,11 +238,11 @@ ifdef USE_OpenMP
 #            LIBS += -lgomp
 endif
 
-ifndef USE_SCRIP
-             LIBS += $(MCT_PARAMS_DIR)/mct_coupler_params.o
-             LIBS += $(MCT_PARAMS_DIR)/mod_coupler_iounits.o
-             LIBS += $(MCT_PARAMS_DIR)/get_sparse_matrix.o
-endif
+#ifndef USE_SCRIP
+ #            LIBS += $(MCT_PARAMS_DIR)/mct_coupler_params.o  # BCU
+ #            LIBS += $(MCT_PARAMS_DIR)/mod_coupler_iounits.o  # BCU
+ #            LIBS += $(MCT_PARAMS_DIR)/get_sparse_matrix.o  # BCU
+#endif
 
 ifdef USE_WW3
              FFLAGS += -frecord-marker=4 -fconvert=big-endian
@@ -245,9 +251,11 @@ ifdef USE_WW3
              LIBS += WW3/build/lib/libww3.a
 endif
 
-ifdef USE_MCT
-       MCT_INCDIR ?= /usr/local/mct/include
-       MCT_LIBDIR ?= /usr/local/mct/lib
+ifdef USE_MCT  # BCU check this if it crashed, try to comment this out
+       MCT_INCDIR ?= $SCRATCH/MCT/Install/include  # BCU
+       MCT_LIBDIR ?= $SCRATCH/MCT/Install/lib  # BCU
+       #MCT_INCDIR ?= /usr/local/mct/include
+       #MCT_LIBDIR ?= /usr/local/mct/lib
            FFLAGS += -I$(MCT_INCDIR)
              LIBS += -L$(MCT_LIBDIR) -lmct -lmpeu
            INCDIR += $(MCT_INCDIR) $(INCDIR)

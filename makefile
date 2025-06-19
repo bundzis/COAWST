@@ -797,12 +797,13 @@ endif
 #--------------------------------------------------------------------------
 #  Target to create ROMS/TOMS dependecies.
 #--------------------------------------------------------------------------
+$(info VAR is $(NETCDF_INCDIR) $(strip $(NETCDF_INCDIR)) $(NETCDF_MODFILE) $(SCRATCH_DIR) )  # BCU
 ifneq ($(MAKECMDGOALS),tarfile)
 $(SCRATCH_DIR)/$(NETCDF_MODFILE): | $(SCRATCH_DIR)
-	cp -f $(NETCDF_INCDIR)/$(NETCDF_MODFILE) $(SCRATCH_DIR)
+	cp -f $(strip $(NETCDF_INCDIR))/$(NETCDF_MODFILE) $(SCRATCH_DIR)
 
 $(SCRATCH_DIR)/$(TYPESIZES_MODFILE): | $(SCRATCH_DIR)
-	cp -f $(NETCDF_INCDIR)/$(TYPESIZES_MODFILE) $(SCRATCH_DIR)
+	cp -f $(strip $(NETCDF_INCDIR))/$(TYPESIZES_MODFILE) $(SCRATCH_DIR)
 
 $(SCRATCH_DIR)/MakeDepend: makefile \
                            $(SCRATCH_DIR)/$(NETCDF_MODFILE) \
