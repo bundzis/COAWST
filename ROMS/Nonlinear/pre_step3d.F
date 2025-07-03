@@ -363,10 +363,14 @@
       DO k=1,N(ng)
         DO j=JstrR,JendR
           DO i=IstrR,IendR
-            t(i,j,k,nstp,itrc)=t(i,j,k,nstp,2)  ! set it to use salt
-            t(i,j,k,nrhs,itrc)=t(i,j,k,nstp,2)
-            t(i,j,k,nstp,itrc+1)=t(i,j,k,nstp,2)*t(i,j,k,nstp,2)
-            t(i,j,k,nrhs,itrc+1)=t(i,j,k,nstp,2)*t(i,j,k,nstp,2)
+            t(i,j,k,nstp,itrc)=t(i,j,k,nstp,2)  ! set it to use salt 
+            t(i,j,k,nrhs,itrc)=t(i,j,k,nstp,2) 
+            t(i,j,k,nstp,itrc+1)=t(i,j,k,nstp,2)*t(i,j,k,nstp,2) 
+            t(i,j,k,nrhs,itrc+1)=t(i,j,k,nstp,2)*t(i,j,k,nstp,2) 
+            t(i,j,k,nstp,itrc+3)=t(i,j,k,nstp,1)  ! set it to use temp
+            t(i,j,k,nrhs,itrc+3)=t(i,j,k,nstp,1) 
+            t(i,j,k,nstp,itrc+4)=t(i,j,k,nstp,1)*t(i,j,k,nstp,1) 
+            t(i,j,k,nrhs,itrc+4)=t(i,j,k,nstp,1)*t(i,j,k,nstp,1) 
           END DO
         END DO
       END DO

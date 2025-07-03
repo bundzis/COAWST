@@ -101,6 +101,7 @@
      &                    MIXING(ng) % Akt,                             &
 #ifdef TS_VAR
      &                    MIXING(ng) % Akr,                             &
+     &                    MIXING(ng) % Akrt,                             &
 #endif
      &                    OCEAN(ng) % W,                                &
 # if defined OMEGA_IMPLICIT
@@ -147,6 +148,7 @@
      &                          Akt,                                    &
 #ifdef TS_VAR
      &                          Akr,                                    &
+     &                          Akrt,                                   &
 #endif
      &                          W,                                      &
 # if defined OMEGA_IMPLICIT
@@ -226,6 +228,7 @@
 #  endif
 #  ifdef TS_VAR
       real(r8), intent(inout) :: Akr(LBi:,LBj:,0:)
+      real(r8), intent(inout) :: Akrt(LBi:,LBj:,0:)
 #  endif
       real(r8), intent(in) :: W(LBi:,LBj:,0:)
 #  if defined OMEGA_IMPLICIT
@@ -278,6 +281,7 @@
       real(r8), intent(in) :: Akt(LBi:UBi,LBj:UBj,0:N(ng),NAT)
 #  ifdef TS_VAR
       real(r8), intent(inout) :: Akr(LBi:UBi,LBj:UBj,0:N(ng))
+      real(r8), intent(inout) :: Akrt(LBi:UBi,LBj:UBj,0:N(ng))
 #  endif
       real(r8), intent(in) :: W(LBi:UBi,LBj:UBj,0:N(ng))
 #  if defined OMEGA_IMPLICIT
@@ -1981,18 +1985,28 @@
           DO k=1,N(ng)
 # if !defined SPLINES_VDIFF
             ! Multiply by oHz to convert to Tunits.
-            t(i,j,k,nnew,itrc)=t(i,j,k,nnew,itrc)*oHz(i,j,k)
-            t(i,j,k,nnew,itrc+1)=t(i,j,k,nnew,itrc+1)*oHz(i,j,k)
+            t(i,j,k,nnew,itrc)=t(i,j,k,nnew,itrc)*oHz(i,j,k) 
+            t(i,j,k,nnew,itrc+1)=t(i,j,k,nnew,itrc+1)*oHz(i,j,k) 
+            ! Repeat for temperature
+            t(i,j,k,nnew,itrc+3)=t(i,j,k,nnew,itrc+3)*oHz(i,j,k) 
+            t(i,j,k,nnew,itrc+4)=t(i,j,k,nnew,itrc+4)*oHz(i,j,k)
 # else
             ! Multiply by oHz to convert to Tunits. Only necessary for MPDATA. 
             if ((Hadvection(itrc,ng)%MPDATA)) then
-              t(i,j,k,nnew,itrc)=t(i,j,k,nnew,itrc)*oHz(i,j,k)
-              t(i,j,k,nnew,itrc+1)=t(i,j,k,nnew,itrc+1)*oHz(i,j,k)
+              t(i,j,k,nnew,itrc)=t(i,j,k,nnew,itrc)*oHz(i,j,k) 
+              t(i,j,k,nnew,itrc+1)=t(i,j,k,nnew,itrc+1)*oHz(i,j,k) 
+              ! Repeat for temperature
+              t(i,j,k,nnew,itrc+3)=t(i,j,k,nnew,itrc+3)*oHz(i,j,k) 
+              t(i,j,k,nnew,itrc+4)=t(i,j,k,nnew,itrc+4)*oHz(i,j,k)
             end if
 # endif
             ! Compute numerical mixing: mnum = ( A{c^2} - (A{c})^2 ) / dt
             t(i,j,k,nnew,itrc+2)=(t(i,j,k,nnew,itrc+1)-                 &
      &                           t(i,j,k,nnew,itrc)*t(i,j,k,nnew,itrc))/&
+     &                           dt(ng)
+            ! Repeat for temperature
+            t(i,j,k,nnew,itrc+5)=(t(i,j,k,nnew,itrc+4)-                 &
+     &                           t(i,j,k,nnew,itrc+3)*t(i,j,k,nnew,itrc+3))/&
      &                           dt(ng)
           END DO
           DO k=1,N(ng)-1
@@ -2001,8 +2015,14 @@
      &                         (z_r(i,j,k+1)-z_r(i,j,k))
             ! Compute destruction of vertical salinity variance, 
             ! mphy = 2*kappa_v*(ds/dz)^2
-            AKr(i,j,k)=2.0_r8*cff*cff*(Akt(i,j,k,itemp)-                &
-     &                                 Akt_bak(itemp,ng))
+            AKr(i,j,k)=2.0_r8*cff*cff*(Akt(i,j,k,itemp)-Akt_bak(itemp,ng))
+
+            ! Compute vertical temperature gradient 
+            cff=(t(i,j,k+1,nnew,itemp)-t(i,j,k,nnew,itemp))/            &
+     &                         (z_r(i,j,k+1)-z_r(i,j,k))
+            ! Compute destruction of vertical temperature variance, 
+            ! mphy = 2*kappa_v*(dT/dz)^2
+            AKrt(i,j,k)=2.0_r8*cff*cff*(Akt(i,j,k,itemp)-Akt_bak(itemp,ng))
           END DO
         END DO
       END DO

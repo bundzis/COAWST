@@ -190,6 +190,7 @@
 #  endif
 #  ifdef TS_VAR
           real(r8), pointer :: avgAKr(:,:,:)
+          real(r8), pointer :: avgAKrt(:,:,:)
 #  endif
 #  ifdef LMD_SKPP
           real(r8), pointer :: avghsbl(:,:)
@@ -488,6 +489,8 @@
 #  ifdef TS_VAR
 !      IF (Aout(idVvis,ng)) THEN
         allocate ( AVERAGE(ng) % avgAKr(LBi:UBi,LBj:UBj,0:N(ng)) )
+        Dmem(ng)=Dmem(ng)+REAL(N(ng)+1,r8)*size2d
+        allocate ( AVERAGE(ng) % avgAKrt(LBi:UBi,LBj:UBj,0:N(ng)) )
         Dmem(ng)=Dmem(ng)+REAL(N(ng)+1,r8)*size2d
 !      END IF
 #  endif
@@ -1072,6 +1075,9 @@
 !     IF (Aout(idVvis,ng)) THEN
         IF (.not.destroy(ng, AVERAGE(ng)%avgAKr, MyFile,                &
      &                   __LINE__, 'AVERAGE(ng)%avgAKr')) RETURN
+        END IF
+        IF (.not.destroy(ng, AVERAGE(ng)%avgAKrt, MyFile,                &
+     &                   __LINE__, 'AVERAGE(ng)%avgAKrt')) RETURN
         END IF
 !    END IF
 #  endif
@@ -1803,6 +1809,7 @@
           DO j=Jmin,Jmax
             DO i=Imin,Imax
               AVERAGE(ng) % avgAKr(i,j,k) = IniVal
+              AVERAGE(ng) % avgAKrt(i,j,k) = IniVal
             END DO
           END DO
         END DO
