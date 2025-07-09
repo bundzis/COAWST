@@ -324,7 +324,7 @@
       real(r8) :: eps = 1.0E-16_r8
       real(r8) :: eps1 = 1.0E-12_r8
 
-      real(r8) :: cff, cff1, cff2, cff3
+      real(r8) :: cff, cff1, cff2, cff3, cffs, cfft
       real(r8) :: betaL, betaR, betaD, betaU
       real(r8) :: rL, rR, rD, rU, rkaL, rkaR, rkaD, rkaU
       real(r8) :: a1, b1, sw, sw_eta, sw_xi
@@ -2011,18 +2011,20 @@
           END DO
           DO k=1,N(ng)-1
             ! Compute vertical salinity gradient 
-            cff=(t(i,j,k+1,nnew,isalt)-t(i,j,k,nnew,isalt))/            &
+            cffs=(t(i,j,k+1,nnew,isalt)-t(i,j,k,nnew,isalt))/            &
      &                         (z_r(i,j,k+1)-z_r(i,j,k))
             ! Compute destruction of vertical salinity variance, 
             ! mphy = 2*kappa_v*(ds/dz)^2
-            AKr(i,j,k)=2.0_r8*cff*cff*(Akt(i,j,k,itemp)-Akt_bak(itemp,ng))
+            ! Removed subtraction of background diffusivity (07/9/2025)
+            AKr(i,j,k)=2.0_r8*cffs*cffs*(Akt(i,j,k,itemp))
 
             ! Compute vertical temperature gradient 
-            cff=(t(i,j,k+1,nnew,itemp)-t(i,j,k,nnew,itemp))/            &
+            cfft=(t(i,j,k+1,nnew,itemp)-t(i,j,k,nnew,itemp))/            &
      &                         (z_r(i,j,k+1)-z_r(i,j,k))
             ! Compute destruction of vertical temperature variance, 
             ! mphy = 2*kappa_v*(dT/dz)^2
-            AKrt(i,j,k)=2.0_r8*cff*cff*(Akt(i,j,k,itemp)-Akt_bak(itemp,ng))
+            AKrt(i,j,k)=2.0_r8*cfft*cfft*(Akt(i,j,k,itemp)) 
+
           END DO
         END DO
       END DO
